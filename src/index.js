@@ -4,7 +4,7 @@ import "./index.css";
 
 class DrawTranche extends React.Component {
   render() {
-    return <div>Draw Tranche</div>;
+    return <div />;
   }
 }
 
@@ -12,7 +12,6 @@ class DrawPile extends React.Component {
   render() {
     return (
       <div>
-        Draw Pile
         <DrawTranche />
       </div>
     );
@@ -21,7 +20,7 @@ class DrawPile extends React.Component {
 
 class DiscardPile extends React.Component {
   render() {
-    return <div>Discard Pile</div>;
+    return <div />;
   }
 }
 
@@ -29,7 +28,6 @@ class InfectionDeck extends React.Component {
   render() {
     return (
       <div>
-        Infection Deck
         <DrawPile />
         <DiscardPile />
       </div>
@@ -79,7 +77,7 @@ class PlayerDeck extends React.Component {
             this.calculateEpidemicProbabilities(i, j, playerDeck.slice()) * 100
           ) + "";
         row.push(
-          <td key={j} class={this.epidemicClass(p)}>
+          <td key={j} className={this.epidemicClass(p)}>
             {p}
           </td>
         );
@@ -96,7 +94,7 @@ class PlayerDeck extends React.Component {
     if (p < 75) {
       return "mid";
     }
-    if (p == 100) {
+    if (p === "100") {
       return "max";
     }
     return "high";
@@ -136,7 +134,7 @@ class PlayerDeck extends React.Component {
         <div>Epidemics Hit: {this.props.epidemicsHit}</div>
         <div>
           <table>
-            <caption>Epidemic Probability</caption>
+            <caption>Epidemic Probability In Next 2 Draws</caption>
             <tbody>
               {this.epidemicProbabilityHeaders()}
               {this.epidemicProbabilities()}
@@ -170,16 +168,71 @@ class TurnEndButtons extends React.Component {
   }
 }
 
+class Setup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      numCityCards: 58,
+      numOtherCards: 8,
+      numPlayers: 4
+    };
+    this.handleChange = this.handleChange.bind(this);
+  }
+  render() {
+    return (
+      <div>
+        <form>
+          <label>
+            City Cards:{" "}
+            <input
+              name="numCityCards"
+              value={this.state.numCityCards}
+              onChange={this.handleChange}
+            />
+          </label>
+          <label>
+            Other Cards:
+            <input
+              name="numOtherCards"
+              value={this.state.numOtherCards}
+              onChange={this.handleChange}
+            />
+          </label>
+          <label>
+            Number of Players:
+            <input
+              name="numPlayers"
+              value={this.state.numPlayers}
+              onChange={this.handleChange}
+            />
+          </label>
+          <input
+            type="submit"
+            value="Setup"
+            onClick={event => {
+              event.preventDefault();
+              this.props.onSetup(this.state);
+            }}
+          />
+        </form>
+      </div>
+    );
+  }
+
+  handleChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value
+    });
+  }
+}
+
 class Pandemic extends React.Component {
   constructor(props) {
     super(props);
     this.noEpidemic = this.noEpidemic.bind(this);
     this.epidemic = this.epidemic.bind(this);
+    this.onSetup = this.onSetup.bind(this);
     this.state = { playerDeck: [], epidemicsHit: 0 };
-  }
-
-  componentDidMount() {
-    this.loadPlayerDeck(58, 8, 4);
   }
 
   // Builds a player deck from a given number of city and non-city cards.
@@ -243,6 +296,14 @@ class Pandemic extends React.Component {
     });
   }
 
+  onSetup(state) {
+    this.loadPlayerDeck(
+      state.numCityCards,
+      state.numOtherCards,
+      state.numPlayers
+    );
+  }
+
   render() {
     return (
       <div>
@@ -252,6 +313,7 @@ class Pandemic extends React.Component {
           playerDeck={this.state.playerDeck}
           epidemicsHit={this.state.epidemicsHit}
         />
+        <Setup onSetup={this.onSetup} />
       </div>
     );
   }

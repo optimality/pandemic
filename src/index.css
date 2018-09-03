@@ -1,0 +1,11 @@
+td.low {
+  background-color: lightgreen;
+}
+
+td.high {
+  background-color: rgb(255, 232, 103);
+}
+
+td.max {
+  background-color: lightcoral;
+}
